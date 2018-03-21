@@ -1,19 +1,19 @@
 ﻿# Creating a basic TypeScript & Vue.js ASP.NET Core site
 
 Creating a site with Vue.js and WebPack is generally geared towards consuming
-Vue.js via ES2015 module syntax, and creating a final 'bundle' containing all the code
+Vue.js via ES2015 module syntax, and creating a final "bundle" containing all the code
 for the site (i.e. a "SPA" like setup). This sample will demonstrate how to author
 a more "traditional" site, consisting of multiple pages where the Vue.js library is
-included in the page via a `<script>` tag, and each page includes its own JavaScript
-script(s).
+included in the page via a `<script>` tag, and each page includes its own JavaScript.
 
-The way Vue.js is structured (as of 2.5.16 at the time of this writing), is to include
+The way Vue.js is structured (as of "2.5.16" at the time of this writin), is to include
 the TypeScript definition files as part of the npm package, and to also only include
 declarations for Vue.js modules (not for the global `Vue` defined when loading the 
-library as a script in a web page). This means the Vue.js definitions should be acquired
-by running `npm install vue`, and that the Vue.js definitions will need to be _imported_
-and then added to the global space. This can be done by adding a file containing the below
-to the TypeScript code, for example in a source file named `vueglobal.ts`
+library as a script in a web page - pending [this pull request](https://github.com/vuejs/vue/pull/7868)).
+This means the Vue.js definitions should be acquired by running `npm install vue`, 
+and that the Vue.js definitions will need to be _imported_ and then added to the global space.
+This can be done by adding a file containing the below to the TypeScript code, for
+example in a source file named `vueglobal.ts`
 
 ```ts
 import { default as _Vue, VNode as _VNode} from "vue";
@@ -73,7 +73,7 @@ the project is built by adding the following property to the .csproj file
 ```
 
 If not already installed, install WebPack and the TypeScript loader via `npm install -D webpack ts-loader`.
-Next add a file named `webpack.config.js` to the root folder. Below shows simple content that
+Next add a file named `webpack.config.js` to the root folder. Below shows sample content that
 creates two bundles based on the entry points "index.ts" and "about.ts" from under the "src" folder,
 creating the bundles "index.js" and "about.js" under "wwwroot/js", and including the source maps inline.
 
@@ -133,5 +133,7 @@ add a `build` script similar to the below:
 }
 ```
 
-Then run WebPack from the command-line via `npm run build`.
+Then run WebPack from the command-line via `npm run build` after any TypeScript edits
+to generate the JavaScript files for the site.
+
 
