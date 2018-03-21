@@ -3,17 +3,41 @@
 Creating a site with Vue.js and WebPack is generally geared towards consuming
 Vue.js via ES2015 module syntax, and creating a final "bundle" containing all the code
 for the site (i.e. a "SPA" like setup). This sample will demonstrate how to author
-a more "traditional" site, consisting of multiple pages where the Vue.js library is
-included in the page via a `<script>` tag, and each page includes its own JavaScript.
+a more "traditional" site using ASP.NET Core, consisting of multiple pages where the Vue.js
+library is included in the page via a `<script>` tag, and each page includes its own JavaScript code.
 
-The way Vue.js is structured (as of "2.5.16" at the time of this writin), is to include
-the TypeScript definition files as part of the npm package, and to also only include
-declarations for Vue.js modules (not for the global `Vue` defined when loading the 
-library as a script in a web page - pending [this pull request](https://github.com/vuejs/vue/pull/7868)).
+At the root of the TypeScript source, a TypeScript config file should be present with the appropritate
+settings for compilation, e.g. in `~/src/tsconfig.json`:
+
+```json
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "module": "es2015",
+    "moduleResolution": "node",
+    "target": "es5",
+    "sourceMap": true,
+    "strict": true
+  }
+}
+```
+
+Note how `compileOnSave` is set to `false`, as the compilation needs to be carried out by WebPack.
+In a Visual Studio/MSBuild based project, stop the default TypeScript build when the project is built
+by adding the following property to the .csproj file
+
+```xml
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+```
+
+The way Vue.js is structured (as of "2.5.16" at the time of this writing), is to include
+the TypeScript definition files as part of the npm package, which only include declarations
+for Vue.js modules (not for the global `Vue` defined when loading the library as
+a script in a web page - pending [this pull request](https://github.com/vuejs/vue/pull/7868)).
 This means the Vue.js definitions should be acquired by running `npm install vue`, 
-and that the Vue.js definitions will need to be _imported_ and then added to the global space.
+and that the Vue.js definitions will need to be _imported_ and added to the global space.
 This can be done by adding a file containing the below to the TypeScript code, for
-example in a source file named `vueglobal.ts`
+example in the source file `~/src/vueglobal.ts`
 
 ```ts
 import { default as _Vue, VNode as _VNode} from "vue";
@@ -25,7 +49,7 @@ declare global {
 ```
 
 Other TypeScript files can then reference the items added to the global scope directly,
-without having to import them first, e.g.
+without having to import them first, e.g. in `~/src/index.ts`
 
 ```ts
 import model from "./model"
@@ -44,33 +68,9 @@ var instance = new component({ el: "#app" });
 ```
 
 Note that this code still uses ES2015 syntax to import other code within the project. WebPack will
-then be used to convert the TypeScript into JavaScript, and package up all the code into a `bundle`
+then be used to convert the TypeScript into JavaScript, and package up all the code into a bundle
 for each script desired. (Note: The bundle will not include Vue.js, as this is assumed now to be an
 available global).
-
-At the root of the TypeScript source, a `tsconfig.json` file should be present with the appropritate
-settings for compilation, e.g.
-
-```json
-{
-  "compileOnSave": false,
-  "compilerOptions": {
-    "module": "es2015",
-    "moduleResolution": "node",
-    "target": "es5",
-    "sourceMap": true,
-    "strict": true
-  }
-}
-```
-
-Note how "compileOnSave" is set to `false`, as the compilation needs to be carried out by WebPack.
-In a Visual Studio/MSBuild based project, stop the default TypeScript build of the tsconfig.json when
-the project is built by adding the following property to the .csproj file
-
-```xml
-    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-```
 
 If not already installed, install WebPack and the TypeScript loader via `npm install -D webpack ts-loader`.
 Next add a file named `webpack.config.js` to the root folder. Below shows sample content that
@@ -107,7 +107,7 @@ module.exports = {
 ```
 
 This bundle, along with the Vue.js library directly from the CDN, would then be included in a page similar
-to the below. (Here showing an ASP.NET Core Razor page)
+to the below. (Here showing the ASP.NET Core Razor page at `~/Pages/Index.cshtml`)
 
 ```cshtml
 @page
@@ -121,7 +121,7 @@ to the below. (Here showing an ASP.NET Core Razor page)
 ```
 
 To run WebPack, the easiest way it to open the `package.json` file from the root of the project, and
-add a `build` script similar to the below:
+add a `build` script entry similar to the below:
 
 ```js
 {
@@ -134,6 +134,4 @@ add a `build` script similar to the below:
 ```
 
 Then run WebPack from the command-line via `npm run build` after any TypeScript edits
-to generate the JavaScript files for the site.
-
-
+to regenerate the JavaScript files for the site.
